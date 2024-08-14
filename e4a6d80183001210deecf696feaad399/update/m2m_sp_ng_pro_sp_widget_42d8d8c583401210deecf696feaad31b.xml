@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_ng_pro_sp_widget">
+    <m2m_sp_ng_pro_sp_widget action="INSERT_OR_UPDATE">
+        <sp_angular_provider display_value="scBasicSelect">e225f8b43b0523008ed00d8044efc4fe</sp_angular_provider>
+        <sp_widget display_value="Configuration Item List">7998508583401210deecf696feaad303</sp_widget>
+        <sys_class_name>m2m_sp_ng_pro_sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-14 05:01:18</sys_created_on>
+        <sys_id>42d8d8c583401210deecf696feaad31b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>scBasicSelect.Configuration Item List</sys_name>
+        <sys_package display_value="Application Services Dashboard" source="x_20346_applicatio">e4a6d80183001210deecf696feaad399</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Application Services Dashboard">e4a6d80183001210deecf696feaad399</sys_scope>
+        <sys_update_name>m2m_sp_ng_pro_sp_widget_42d8d8c583401210deecf696feaad31b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-14 05:01:18</sys_updated_on>
+    </m2m_sp_ng_pro_sp_widget>
+</record_update>

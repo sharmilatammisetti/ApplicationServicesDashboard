@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function(spAriaUtil, i18n,$scope,spUtil) {
+	var c = this;
+ 	c.toggleExpand = function(record) {
+  	record.expanded = !record.expanded;
+  };
+	 c.onRecordSelect = function() {
+       	c.server.get({appServiceId: c.data.selectedAppService}).then(function(response) {       
+		 			c.data = response.data;	
+        });
+    };
+	
+	 c.exportToExcel = function() {
+        // Prepare data for export
+        var data = c.data.related_records.map(item => ({
+            Name: item.name,
+            Status: item.state,
+            Class: item.classname,
+            Model: item.model,
+            Manufacturer: item.manufacturer
+        }));
+
+        // Create a worksheet and workbook
+        var worksheet = XLSX.utils.json_to_sheet(data);
+        var workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "ConfigItems");
+				
+        // Export the workbook to an Excel file
+        XLSX.writeFile(workbook, "ConfigItems.xlsx");
+    };
+	
+	$scope.$on("businessAppSelectedforCIs", function(evt, parms) {
+		c.data.sys_id = parms.sys_id;
+		
+		c.server.update().then(function(response) {	
+			spUtil.update($scope);
+		})
+	});
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>$sp-space--sm: 8px !default;
+.panel-heading {
+  position: relative;
+  &gt; .fa-filter { 
+    position: absolute;
+    top: 1rem; 
+    right: 1rem; 
+  }
+}
+
+.panel {
+  &gt; .list-group, &gt;.panel-collapse{
+    	.list-group-item {
+		  	border-width: 1px 0 0 0;
+      }
+  }
+  .requests-header-container {
+    margin: 0px;
+    border-top: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: min-content;
+    
+    .fit-content {
+      min-width: fit-content;
+    }
+  }
+}
+
+.btn-show-more {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+}
+
+.control-view {
+  display: flex;
+  align-items: baseline;
+}
+
+@media  (min-width: 768px) and (max-width: 991px) {
+	.padding-left-large {
+		padding-left: 45px !important;
+	}
+}
+
+@media  (max-width: 991px) {
+  .adjust-width {
+	width: 100% !important;
+  }
+  .align-icon {
+	padding: 6px $sp-space--sm;
+  }
+}
+
+.column-headers {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 1;
+  background-color: $panel-bg;
+  box-shadow: 0px 1px 0px $panel-inner-border;
+  font-weight: 700;
+}
+
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>configuration_item_list</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Configuration Item List</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+    data.records = [];
+    data.related_records = [];
+    var exportData = [];
+    //if(input && input.sys_id) {
+    if (input) {
+
+        var localInput = input; //to safeguard pullution of "input" via BR or other scripts
+
+        var alsoRequest = false;
+        var recordIdx = 0;
+        var limit = 5;
+        //var limit = options.items_per_page? options.items_per_page : 5;
+        if (localInput && localInput.action == 'fetch_more')
+            data.lastLimit = localInput.lastLimit + limit;
+        else
+            data.lastLimit = limit;
+
+        data.hasMore = false;
+				
+
+			
+        if (input.appServiceId) {
+            var relatedGR = new GlideRecord('cmdb_rel_ci'); // Replace with your related table
+            relatedGR.addEncodedQuery("parent=" + input.appServiceId + "^type=1a9cb166f1571100a92eb60da2bce5c5");
+            relatedGR.query();
+            while (relatedGR.next()) {
+                var related_record = {
+                    sys_id: relatedGR.sys_id.toString(),
+                    name: relatedGR.child.name.toString(),
+										state: relatedGR.child.install_status.getDisplayValue(),
+										classname: relatedGR.child.sys_class_name.getDisplayValue(),
+										model: relatedGR.child.model.getDisplayValue(),
+										manufacturer: relatedGR.child.manufacturer.getDisplayValue()
+                };
+                data.related_records.push(related_record);
+            }
+            var bus_app = new GlideRecord("cmdb_rel_ci");
+            bus_app.addEncodedQuery("type=41008aa6ef32010098d5925495c0fb94^child=" + input.appServiceId);
+            bus_app.query();
+            if (bus_app.next()) {
+                var rel_cis = new GlideRecord("cmdb_rel_ci");
+                rel_cis.addEncodedQuery("type=41008aa6ef32010098d5925495c0fb94^parent=" + bus_app.parent.sys_id);
+                rel_cis.query();
+                while (rel_cis.next()) {
+                    var record = {
+                        sys_id: rel_cis.child.sys_id.toString(),
+                        name: rel_cis.child.name.toString()
+                    };
+                    data.records.push(record);
+                }
+            }
+        } else {
+            var mainGR = new GlideRecord('cmdb_rel_ci'); // Replace with your table
+            mainGR.addEncodedQuery("parent=" + input.sys_id + "^type=41008aa6ef32010098d5925495c0fb94");
+            mainGR.query();
+            while (recordIdx != data.lastLimit && mainGR.next()) {
+                var record = {
+                    sys_id: mainGR.child.sys_id.toString(),
+                    name: mainGR.child.name.toString()
+                };
+                data.records.push(record);
+
+                var relatedGR = new GlideRecord('cmdb_rel_ci'); // Replace with your related table
+                relatedGR.addEncodedQuery("parent=" + mainGR.child.sys_id + "^type=1a9cb166f1571100a92eb60da2bce5c5");
+                relatedGR.query();
+
+                while (relatedGR.next()) {
+                    var related_record = {
+                        sys_id: relatedGR.sys_id.toString(),
+                        name: relatedGR.child.name.toString(),
+												state: relatedGR.child.install_status.getDisplayValue(),
+												classname: relatedGR.child.sys_class_name.getDisplayValue(),
+												model: relatedGR.child.model.getDisplayValue(),
+												manufacturer: relatedGR.child.manufacturer.getDisplayValue()
+                    };
+                    data.related_records.push(related_record);
+                }
+                recordIdx++;
+            }
+        }
+        if (mainGR.next())
+            data.hasMore = true;
+    }
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-14 05:00:12</sys_created_on>
+        <sys_id>7998508583401210deecf696feaad303</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Configuration Item List</sys_name>
+        <sys_package display_value="Application Services Dashboard" source="x_20346_applicatio">e4a6d80183001210deecf696feaad399</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Application Services Dashboard">e4a6d80183001210deecf696feaad399</sys_scope>
+        <sys_update_name>sp_widget_7998508583401210deecf696feaad303</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-14 05:00:47</sys_updated_on>
+        <template><![CDATA[<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<div class="panel panel-default b" ng-init="c.trackPage()">
+ <div class="panel-heading" ng-show="::!data.is_associated_ticket_tab">
+    <h2 class="panel-title ng-binding">Configuration Items</h2>
+  </div> 	
+  <div class="panels-container list-group">
+			<div ng-show="::!data.is_associated_ticket_tab" class="list-group-item row requests-header-container">
+          <div class="col-md-4 col-xs-12 m-b-sm fit-content">
+            <div class="form-inline control-view" ng-if="c.options.show_view == 'true'">
+            	<label class="control-label hidden-xs wrapper-xs " id="label_Service" for="Service">
+                ${Service}
+              </label>
+              <select ng-model="c.data.selectedAppService" id="Service" class="sc-basic-select adjust-width" ng-change="c.onRecordSelect()" style="width:80%">
+                <option value="">-- None --</option>
+              	<option ng-repeat="appService in c.data.records" value="{{appService.sys_id}}">
+      						{{appService.name}}
+   							</option>
+              </select>
+            </div>
+          </div>
+        
+
+          <div class="col-md-1 col-xs-12 padding-left-large fit-content">
+            <div class="input-group" style="width:100%">
+              <span class="input-group-btn">
+      					<button class="btn btn-primary" type="button" ng-click="c.exportToExcel()">Export</button>
+    					</span>
+            </div>
+       	 </div>
+    	</div>
+
+    <div role="table" ng-if="true" class="table" aria-label="{{::data.messages.configurationitemsTitle}}">
+      <div ng-show="::!data.is_associated_ticket_tab" role="rowgroup" class="column-headers">
+        <div role="row" class="list-group-item table-responsive">
+          <span role="columnheader" class="col-xs-4 padder-r-none padder-l-none">${Name}</span>
+       		<span role="columnheader" class="col-xs-2 padder-r-none padder-l-none">${Status}</span>
+          <span role="columnheader" class="col-xs-2 padder-r-none padder-l-none">${Class}</span>
+          <span role="columnheader" class="col-xs-2 padder-r-none padder-l-none">${Model}</span>
+          <span role="columnheader" class="col-xs-2 padder-r-none padder-l-none">${Manufacturer}</span>
+        </div>
+   	  </div>
+      <ul role="rowgroup" class="padder-l-none padder-r-none">
+        <li role="row" class="list-group-item table-responsive" ng-repeat="record in c.data.related_records" style="margin:0px" >
+          <div role="cell" class="col-xs-4 padder-l-none padder-r-none name-column">
+            <div class="name">
+             <!-- <a href="/{{::item.url.table}}.do?sys_id={{::item.url.sys_id}}"><span> {{::item.name}}</span></a>-->
+              <span> {{record.name}}</span>
+            </div>
+          </div>
+          <div role="cell" class="col-xs-2 padder-l-none padder-r-none status-column">
+            <div class="status">
+              <span> {{record.state}}</span>
+            </div>
+          </div>
+
+          <div role="cell" class="col-xs-2 padder-l-none padder-r-none class-column">
+            <div class="class">
+              <span> {{record.classname}}</span>
+            </div>
+          </div>
+          <div role="cell" class="col-xs-2 padder-l-none padder-r-none model-column">
+            <div class="model">
+              <span> {{record.model}}</span>
+            </div>
+          </div>
+          <div role="cell" class="col-xs-2 padder-l-none padder-r-none manufacturer-column">
+            <div class="manufacture">
+              <span> {{record.manufacturer}}</span>
+            </div>
+           </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+<div class="col-sm-12 pull-none" ng-if="c.data.hasMore" style="padding-bottom:15px">
+					<div class="text-a-c" ng-if="c.fetching">
+          	<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+						<span class="sr-only">${Loading more requests}</span>  
+  	      </div>
+          <button class="btn btn-default btn-show-more" ng-click="c.loadMore()"> {{::data.messages.showMoreRequests}} </button>  
+      </div>]]></template>
+    </sp_widget>
+</record_update>

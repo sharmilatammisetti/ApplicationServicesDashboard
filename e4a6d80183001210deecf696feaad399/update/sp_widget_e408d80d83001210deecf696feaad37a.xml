@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $rootScope,$uibModal) {
+  var c = this;
+  
+  c.businessApplication = {
+    displayValue: '',
+    value: '',
+    name: 'business_application'
+  };
+
+  $scope.$on('field.change', function(evt, parms) {
+    if (parms.field.name == 'business_application') {
+      c.selectedBusinessApp = parms.newValue;
+      // Broadcast the selection to other widgets
+      $rootScope.$broadcast('businessAppSelected', {
+        sys_id: c.selectedBusinessApp,
+        displayValue: c.businessApplication.displayValue
+      });
+			$rootScope.$broadcast('businessAppSelectedforCIs', {
+        sys_id: c.selectedBusinessApp,
+        displayValue: c.businessApplication.displayValue
+      });
+    }
+  });
+	c.showInfo = function() {
+    if (c.selectedBusinessApp) {
+      // Fetch additional details about the selected Business Application
+      var modalInstance = $uibModal.open({
+        templateUrl: 'businessAppInfo.html',
+        controller: function BusinessAppInfoCtrl($scope, $uibModalInstance, businessAppId, $http) {
+					$scope.businessAppDetails = {};
+					c.server.get({busappId: businessAppId}).then(function(response) {    
+		 				$scope.businessAppDetails = response.data.businessApp;	
+        	});
+  				// Fetch details from the server
+					/*
+  				$http.get('/api/now/table/cmdb_ci_business_app/' + businessAppId)
+    			.then(function(response) {
+      			$scope.businessAppDetails = response.data.result;
+    			});
+					*/
+  				$scope.ok = function() {
+    				$uibModalInstance.close();
+  				};
+				},
+        resolve: {
+          businessAppId: function() {
+            return c.selectedBusinessApp;
+          }
+        }
+      });
+    } else {
+      alert('Please select a Business Application first.');
+    }
+  };
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>  .business-app-card .scrollable-content {
+    max-height: 300px; /* Adjust this value as needed */
+    overflow-y: auto;
+    padding-right: 15px; /* Add some padding for the scrollbar */
+  }
+
+.business-app-card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.business-app-card .panel-heading {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.business-app-card .panel-title {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.business-app-card .subtitle {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.business-app-card dl {
+  margin-bottom: 0;
+}
+
+.business-app-card dt {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.business-app-card dd {
+  margin-bottom: 10px;
+}
+
+
+.widget-border {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  margin: 10px;
+  background-color: #f9f9f9;
+}
+
+.widget-padding {
+  margin-bottom: 25px;
+}
+
+.form-group {
+    
+  }
+
+  .info-icon {
+    margin-left: 8px;
+    cursor: pointer;
+    color: #007bff; /* Optional: Change the color of the icon */
+  }
+
+  .info-icon:hover {
+    color: #0056b3; /* Optional: Change the color on hover */
+  }</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>business_applications_selection</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Business Applications Selection</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+	
+	if(input.busappId){
+		var busGR = new GlideRecord('cmdb_ci_business_app');
+		busGR.get(input.busappId);
+		data.businessApp = {};
+		//$sp.getRecordDisplayValues(data.businessApp, busGR, 'sys_id,name');
+
+    
+      data.businessApp = {
+        name: busGR.name.toString(),
+        assigned_to: busGR.assigned_to.first_name.toString(),
+				number: busGR.number.toString(),
+				application_type: busGR.application_type.getDisplayValue(),
+				application_category: busGR.application_category.toString(),
+				apm_application_family: busGR.apm_application_family.toString(),
+				architecture_type: busGR.architecture_typre.toString(),
+				install_type: busGR.install_type.getDisplayValue(),
+				install_status: busGR.install_status.getDisplayValue(),
+				life_cycle_stage: busGR.life_cycle_stage.toString(),
+				life_cycle_stage_status: busGR.life_cycle_stage_status.toString(),
+				plateform: busGR.plateform.toString(),
+				business_unit: busGR.business_unit.name.toString(),
+				user_base: busGR.user_base.toString(),
+				manufacturer: busGR.manufacturer.toString(),
+				description: busGR.short_description.toString(),
+				Vendor: busGR.Vendor.toString(),
+				support_vendor: busGR.support_vendor.name.toString(),
+				owned_by: busGR.owned_by.name.tostring(),
+				managed_by: busGR.managed_by.name.toString(),
+				managed_by_group: busGR.managed_by_group.name.toString(),
+				it_application_owner: busGR.it_application_owner.name.toString(),
+				supported_by: busGR.supported_by.name.toString(),
+				support_group: busGR.support_group.name.toString(),
+				business_criticality: busGR.business_criticality.getDisplayValue(),
+				emergency_tier: busGR.emergency_tier.getDisplayValue(),
+				data_classification: busGR.data_classification.getDisplayValue()
+      };
+    
+	}
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-14 04:57:39</sys_created_on>
+        <sys_id>e408d80d83001210deecf696feaad37a</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Business Applications Selection</sys_name>
+        <sys_package display_value="Application Services Dashboard" source="x_20346_applicatio">e4a6d80183001210deecf696feaad399</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Application Services Dashboard">e4a6d80183001210deecf696feaad399</sys_scope>
+        <sys_update_name>sp_widget_e408d80d83001210deecf696feaad37a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-14 04:58:28</sys_updated_on>
+        <template><![CDATA[<div class="col-xs-12 col-md-4 col-lg-8">
+  Business Applications
+</div>
+<div class="form-group">
+<div class="col-xs-10 col-sm-10">
+  <sn-record-picker 
+  	field="c.businessApplication" 
+  	table="'cmdb_ci_business_app'" 
+  	display-field="'name'" 
+  	value-field="'sys_id'" 
+  	search-fields="'name,description'" 
+  	page-size="20">
+	</sn-record-picker>
+  </div>
+  <div class="col-xs-2 col-sm-3 col-lg-2">
+     <button type="button" ng-click="c.showInfo()" class="btn btn-default btn-ref icon icon-info" title="Select a business application from the list">
+    </button>
+  </div>
+ 
+
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

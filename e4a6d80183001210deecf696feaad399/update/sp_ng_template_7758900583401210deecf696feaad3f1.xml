@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_ng_template">
+    <sp_ng_template action="INSERT_OR_UPDATE">
+        <id>businessAppInfo.html</id>
+        <sp_widget display_value="Business Applications Selection">e408d80d83001210deecf696feaad37a</sp_widget>
+        <sys_class_name>sp_ng_template</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-14 04:59:22</sys_created_on>
+        <sys_id>7758900583401210deecf696feaad3f1</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>businessAppInfo.html</sys_name>
+        <sys_package display_value="Application Services Dashboard" source="x_20346_applicatio">e4a6d80183001210deecf696feaad399</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Application Services Dashboard">e4a6d80183001210deecf696feaad399</sys_scope>
+        <sys_update_name>sp_ng_template_7758900583401210deecf696feaad3f1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-14 04:59:22</sys_updated_on>
+        <template><![CDATA[<div class="modal-header">
+  <h3 class="modal-title">Business Application Details</h3>
+</div>
+<div class="modal-body">
+  <!-- Display details of the Business Application -->
+  <div class="panel-body scrollable-content">
+  	<div class="panel-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl>
+          <dt>Name</dt>
+          <dd>{{businessAppDetails.name || 'None'}}</dd>
+          <dt>Number</dt>
+          <dd>{{businessAppDetails.number  || 'None'}}</dd>
+          <dt>Application Type</dt>
+          <dd>{{businessAppDetails.application_type  || 'None'}}</dd>
+          <dt>Application Category</dt>
+          <dd>{{businessAppDetails.application_category  || 'None'}}</dd>
+          <dt>Application Family</dt>
+          <dd>{{businessAppDetails.apm_application_family  || 'None'}}</dd>
+          <dt>Architecuture Type</dt>
+          <dd>{{businessAppDetails.architecture_type  || 'None'}}</dd>
+          <dt>Install Type</dt>
+          <dd>{{businessAppDetails.install_type || 'None'}}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl>
+          <dt>Install Status</dt>
+          <dd>{{businessAppDetails.install_status || 'None'}}</dd>
+          <dt>Life Cycle Stage</dt>
+          <dd>{{businessAppDetails.life_cycle_stage || 'None'}}</dd>
+          <dt>Life Cycle Stage Status</dt>
+          <dd>{{businessAppDetails.life_cycle_stage_status || 'None'}}</dd>
+          <dt>Platform</dt>
+          <dd>{{businessAppDetails.platform || 'None'}}</dd>
+          <dt>Business Unit</dt>
+          <dd>{{businessAppDetails.business_unit || 'None'}}</dd>
+          <dt>User Base</dt>
+          <dd>{{businessAppDetails.user_base || 'None'}}</dd>
+          <dt>Manufacturer</dt>
+          <dd>{{businessAppDetails.manufacturer || 'None'}}</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <dl>
+          <dt>Description</dt>
+          <dd>{{businessAppDetails.description || 'None'}}</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <dl>
+          <dt>Vendor</dt>
+          <dd>{{businessAppDetails.vendor || 'None'}}</dd>
+          <dt>Support Vendor</dt>
+          <dd>{{businessAppDetails.support_vendor || 'None'}}</dd>
+          <dt>Owned By</dt>
+          <dd>{{businessAppDetails.owned_by || 'None'}}</dd>
+          <dt>Managed By</dt>
+          <dd>{{businessAppDetails.managed_by || 'None'}}</dd>
+          <dt>Managed By Group</dt>
+          <dd>{{businessAppDetails.managed_by_group || 'None'}}</dd>
+          
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl>
+          <dt>IT Application Owner</dt>
+          <dd>{{businessAppDetails.it_application_owner || 'None'}}</dd>
+          <dt>Supported By</dt>
+          <dd>{{businessAppDetails.supported_by || 'None'}}</dd>
+          <dt>Support Group</dt>
+          <dd>{{businessAppDetails.support_group || 'None'}}</dd>
+          <dt>Business Criticality</dt>
+          <dd>{{businessAppDetails.business_criticality || 'None'}}</dd>
+          <dt>Emergency Tier</dt>
+          <dd>{{businessAppDetails.emergency_tier || 'None'}}</dd>
+          <dt>Data Classification</dt>
+          <dd>{{businessAppDetails.data_classification || 'None'}}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- Add more fields as needed -->
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+</div>]]></template>
+    </sp_ng_template>
+</record_update>
